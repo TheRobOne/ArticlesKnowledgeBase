@@ -9,7 +9,30 @@ app.set('view engine', 'pug');
 
 //home route
 app.get('/', (req, res) => {
-  res.render('index');
+  let articles = [
+    {
+      id: 1,
+      title: 'Article One',
+      author: 'Maciej Rusek',
+      desc: 'This is article one'
+    },
+    {
+      id: 2,
+      title: 'Article Two',
+      author: 'Maciej Rusek',
+      desc: 'This is article two'
+    },
+    {
+      id: 3,
+      title: 'Article Three',
+      author: 'Maciej Rusek',
+      desc: 'This is article three'
+    }
+  ];
+  res.render('index', {
+    title: 'Home',
+    articles: articles
+  });
 });
 
 //add article route
