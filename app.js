@@ -1,7 +1,22 @@
 const express = require('express');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const app = express();
+
+//connect do DB
+const nodekb = 'mongodb://localhost/nodekb';
+mongoose.connect(nodekb);
+let db = mongoose.connection;
+
+//check for errors
+db.once('open', () => {
+  console.log("Connect to mongodb");
+});
+
+db.on('error', (err) => {
+  console.log(err);
+});
 
 //set views
 app.set('views', path.join(__dirname, 'views'));
