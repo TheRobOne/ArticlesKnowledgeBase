@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 
+//Bring in article model
+let Article = require('./models/article');
+
 const app = express();
 
 //connect do DB
@@ -18,35 +21,22 @@ db.on('error', (err) => {
   console.log(err);
 });
 
+
 //set views
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 //home route
 app.get('/', (req, res) => {
-  let articles = [
-    {
-      id: 1,
-      title: 'Article One',
-      author: 'Maciej Rusek',
-      desc: 'This is article one'
-    },
-    {
-      id: 2,
-      title: 'Article Two',
-      author: 'Maciej Rusek',
-      desc: 'This is article two'
-    },
-    {
-      id: 3,
-      title: 'Article Three',
-      author: 'Maciej Rusek',
-      desc: 'This is article three'
+  Article.find({}, (err, articles) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('index', {
+        title: 'Home',
+        articles: articles
+      });
     }
-  ];
-  res.render('index', {
-    title: 'Home',
-    articles: articles
   });
 });
 
