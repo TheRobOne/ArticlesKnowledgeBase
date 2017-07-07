@@ -9,9 +9,12 @@ let Article = require('./models/article');
 const app = express();
 
 // Bring in bodyParser
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+//set up public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 //connect do DB
 const nodekb = 'mongodb://localhost/nodekb';
@@ -19,7 +22,7 @@ mongoose.connect(nodekb);
 let db = mongoose.connection;
 
 //check for errors
-db.once('openUri', () => {
+db.once('openUr', () => {
   console.log("Connect to mongodb");
 });
 
