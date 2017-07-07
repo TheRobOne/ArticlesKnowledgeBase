@@ -50,7 +50,20 @@ app.get('/', (req, res) => {
   });
 });
 
-//get method add article route
+//get article by id
+app.get('/article/:id', (req, res) => {
+  Article.findById(req.params.id, (err, article) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('article', {
+        article: article
+      });  
+    }
+  });
+});
+
+//get method for add article route
 app.get('/articles/add', (req,res) =>{
   res.render('add_article', {
     title: 'add article'
