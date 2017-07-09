@@ -58,7 +58,7 @@ app.get('/article/:id', (req, res) => {
     } else {
       res.render('article', {
         article: article
-      });  
+      });
     }
   });
 });
@@ -83,6 +83,19 @@ app.post('/articles/add', function(req, res){
       return;
     } else {
       res.redirect('/');
+    }
+  });
+});
+
+//get article by id for edit
+app.get('/article/edit/:id', (req, res) => {
+  Article.findById(req.params.id, (err, article) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('edit_article', {
+        article: article
+      });
     }
   });
 });
