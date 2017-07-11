@@ -22,6 +22,7 @@ html
               a(href='/articles/add') Add article
     
     .container
+      != messages('message', locals)
       block content
       br
       hr

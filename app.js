@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const session = require('expess-session');
+const session = require('express-session');
 const flash = require('connect-flash');
 
 //Bring in article model
@@ -37,16 +37,8 @@ app.set('trust proxy', 1) // trust first proxy
 app.use(session({
   secret: 'keyboard cat',
   resave: true,
-  saveUninitialized: true,
-  cookie: { secure: true }
+  saveUninitialized: true
 }));
-
-//connect flash middleware
-app.configure(function() {
-  app.use(express.cookieParser('keyboard cat'));
-  app.use(express.session({ cookie: { maxAge: 60000 }}));
-  app.use(flash());
-});
 
 //flash messages middleware
 app.use(require('connect-flash')());
@@ -106,6 +98,7 @@ app.post('/articles/add', function(req, res){
       console.log(err);
       return;
     } else {
+      req.flash('success', 'Article added');
       res.redirect('/');
     }
   });
@@ -138,6 +131,7 @@ app.post('/article/edit/:id', (req, res) => {
       console.log(err);
       return;
     } else {
+      req.flash('success', 'Article edited');
       res.redirect('/');
     }
   });
@@ -150,6 +144,7 @@ app.delete('/article/:id', (req, res) => {
     if(err){
       console.log(err);
     } else{
+      req.flash('danger', 'Article deleted');
       res.send('Success');
     }
   });
