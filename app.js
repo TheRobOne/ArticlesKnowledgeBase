@@ -119,6 +119,18 @@ app.post('/article/edit/:id', (req, res) => {
   });
 });
 
+app.delete('/article/:id', (req, res) => {
+  let query = {_id:req.params.id}
+
+  Article.remove(query, (err) => {
+    if(err){
+      console.log(err);
+    } else{
+      res.send('Success');
+    }
+  });
+});
+
 //start app
 app.listen(3000, () => {
   console.log('Run app on port 3000');
