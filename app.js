@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
+const expressValidator = require('express-validator');
 
 //Bring in article model
 let Article = require('./models/article');
@@ -47,6 +48,24 @@ app.use(function (req, res, next) {
   next();
 });
 
+//validator middleware
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value) {
+      var namespace = param.split('.')
+      , root    = namespace.shift()
+      , formParam = root;
+
+    while(namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param : formParam,
+      msg   : msg,
+      value : value
+    };
+  }
+}));
+
 //set views
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -88,20 +107,35 @@ app.get('/articles/add', (req,res) =>{
 
 //post method for add article route
 app.post('/articles/add', function(req, res){
-  let article = new Article();
-  article.title = req.body.title;
-  article.author = req.body.author;
-  article.body = req.body.body;
+  req.checkBody('title', 'Titile is required.').notEmpty();
+  req.checkBody('author', 'Author is required.').notEmpty();
+  req.checkBody('body', 'Body is required.').notEmpty();
 
-  article.save((err) => {
-    if(err){
-      console.log(err);
-      return;
-    } else {
-      req.flash('success', 'Article added');
-      res.redirect('/');
-    }
-  });
+  //get errors
+  let errors = req.validationErrors();
+
+  if(errors){
+    req.flash('danger', 'Fill all fields');
+    res.render('add_article', {
+      title: 'Add article',
+      errors: errors
+    });
+  } else{
+    let article = new Article();
+    article.title = req.body.title;
+    article.author = req.body.author;
+    article.body = req.body.body;
+
+    article.save((err) => {
+      if(err){
+        console.log(err);
+        return;
+      } else {
+        req.flash('success', 'Article added');
+        res.redirect('/');
+      }
+    });
+  }
 });
 
 //get article by id for edit
