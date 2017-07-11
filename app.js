@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const session = require('expess-session');
+const flash = require('connect-flash');
 
 //Bring in article model
 let Article = require('./models/article');
@@ -30,6 +32,28 @@ db.on('error', (err) => {
   console.log(err);
 });
 
+//session middleware
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: true,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
+//connect flash middleware
+app.configure(function() {
+  app.use(express.cookieParser('keyboard cat'));
+  app.use(express.session({ cookie: { maxAge: 60000 }}));
+  app.use(flash());
+});
+
+//flash messages middleware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+  res.locals.messages = require('express-messages')(req, res);
+  next();
+});
 
 //set views
 app.set('views', path.join(__dirname, 'views'));
