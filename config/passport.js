@@ -1,6 +1,6 @@
-const LocalStrategy = require('passport-local').Strategy();
+const LocalStrategy = require('passport-local').Strategy;
 const User = require('../models/user');
-const dbConfig = require('database');
+const dbConfig = require('../config/database');
 const bcrypt = require('bcrypt');
 
 module.exports = (passport) => {
@@ -13,7 +13,7 @@ module.exports = (passport) => {
           console.log(err);
         }
         if(!user) {
-          return(null, false, {message: 'No user found'});
+          return done(null, false, {message: 'No user found'});
         }
 
         //Match password

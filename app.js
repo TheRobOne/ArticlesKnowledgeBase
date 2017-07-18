@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const expressValidator = require('express-validator');
+const passport = require('passport');
 const dbConfig = require('./config/database');
 
 //Bring in article model
@@ -65,6 +66,11 @@ app.use(expressValidator({
     };
   }
 }));
+
+//Passport config and middleware
+require('./config/passport')(passport);
+app.use(passport.initialize());
+app.use(passport.session());
 
 //set views
 app.set('views', path.join(__dirname, 'views'));
