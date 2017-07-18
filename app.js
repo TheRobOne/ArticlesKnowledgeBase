@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const expressValidator = require('express-validator');
+const dbConfig = require('./config/database');
 
 //Bring in article model
 let Article = require('./models/article');
@@ -20,8 +21,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //connect do DB
-const nodekb = 'mongodb://localhost/nodekb';
-mongoose.connect(nodekb);
+mongoose.connect(dbConfig.database);
 let db = mongoose.connection;
 
 //check for errors
