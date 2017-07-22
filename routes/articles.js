@@ -14,7 +14,6 @@ router.get('/add', (req,res) =>{
 //post method for add article route
 router.post('/add', function(req, res){
   req.checkBody('title', 'Titile is required.').notEmpty();
-  req.checkBody('author', 'Author is required.').notEmpty();
   req.checkBody('body', 'Body is required.').notEmpty();
 
   //get errors
@@ -29,7 +28,7 @@ router.post('/add', function(req, res){
   } else{
     let article = new Article();
     article.title = req.body.title;
-    article.author = req.body.author;
+    article.author = req.user._id;
     article.body = req.body.body;
 
     article.save((err) => {
