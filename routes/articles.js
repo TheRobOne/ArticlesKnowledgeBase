@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-//Bring in article model
+//Bring in article and user model
 let Article = require('../models/article');
+let User = require('../models/user');
 
 //get method for add article route
 router.get('/add', (req,res) =>{
@@ -95,8 +96,15 @@ router.get('/:id', (req, res) => {
     if(err){
       console.log(err);
     } else {
-      res.render('article', {
-        article: article
+      User.findById(article.author, (err, user) => {
+        if (err){
+          console.log(err);
+        } else {
+        res.render('article', {
+          article: article,
+          author: user.name
+        });
+        }
       });
     }
   });
