@@ -6,7 +6,7 @@ let Article = require('../models/article');
 let User = require('../models/user');
 
 //get method for add article route
-router.get('/add', (req,res) =>{
+router.get('/add', ensureAuthenticated, (req,res) =>{
   res.render('add_article', {
     title: 'add article'
   });
@@ -45,15 +45,19 @@ router.post('/add', function(req, res){
 });
 
 //get article by id for edit
-router.get('/edit/:id', (req, res) => {
+router.get('/edit/:id', ensureAuthenticated, (req, res) => {
   Article.findById(req.params.id, (err, article) => {
     if(err){
       console.log(err);
     } else {
-      res.render('edit_article', {
-        title: 'Edit Article',
-        article: article
-      });
+      if(article.author != req.user._id){
+        req.flash('danger', 'Not authorized')
+      } else {
+        res.render('edit_article', {
+          title: 'Edit Article',
+          article: article
+        });
+      }
     }
   });
 });
@@ -78,14 +82,25 @@ router.post('/edit/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
+  if(!req.user._id){
+    res.status(500).send();
+  }
+
   let query = {_id:req.params.id}
 
-  Article.remove(query, (err) => {
-    if(err){
-      console.log(err);
-    } else{
-      req.flash('danger', 'Article deleted');
-      res.send('Success');
+  Article.findById(req.params.id, (err, article) => {
+    if(article.author != req.user._id){
+      res.status(500).send();
+    } else {
+
+      Article.remove(query, (err) => {
+        if(err){
+          console.log(err);
+        } else {
+          req.flash('danger', 'Article deleted');
+          res.send('Success');
+        }
+      });
     }
   });
 });
@@ -109,5 +124,15 @@ router.get('/:id', (req, res) => {
     }
   });
 });
+
+//Access controller
+function ensureAuthenticated(req, res, next){
+  if(req.isAuthenticated()){
+    return next();
+  } else {
+    req.flash('danger', 'Please login');
+    res.redirect('/users/login');
+  }
+}
 
 module.exports = router;
