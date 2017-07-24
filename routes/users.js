@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 const passport = require('passport');
 
@@ -48,7 +49,8 @@ router.post('/register', (req, res) => {
             if(err){
               console.log(err);
             } else {
-              req.flash('success', 'You are now registered and can log in');
+              sendActivationEmail('maciejrusek94@gmail.com');
+              req.flash('success', 'You are now registered, check email to activate acount');
               res.redirect('login');
             }
           });
@@ -76,5 +78,36 @@ router.get('/logout', (req, res) => {
   req.flash('success', 'You are logged out');
   res.redirect('/users/login');
 });
+
+
+
+function sendActivationEmail(receiver){
+  // create reusable transporter object
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.poczta.onet.pl',
+    port: 465,
+    secure: true,
+    auth: {
+      user: 'nodekb@onet.pl',
+      pass: 'nodeKB12'
+    }
+  });
+
+  let mailOptions = {
+    from: 'nodekb@onet.pl',
+    to: receiver,
+    subject: 'This is your activation link.',
+    text: 'activationLink',
+    html: '<p> elo </p>'
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if(err){
+      console.log(err);
+    } else {
+      console.log('Message %s sent: %s', info.messageId, info.response);
+    }
+  });
+}
 
 module.exports = router

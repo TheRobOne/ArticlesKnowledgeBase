@@ -17,6 +17,10 @@ let userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  activated:{
+    type: Boolean,
+    default: false
+  }
 });
 
 let User = module.exports = mongoose.model('User', userSchema);
