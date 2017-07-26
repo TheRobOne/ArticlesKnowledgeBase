@@ -50,8 +50,8 @@ router.post('/register', (req, res) => {
             if(err){
               console.log(err);
             } else {
-
-              sendActivationEmail(newUser.email);
+              let activationLink = 'localhost:3000/users/activate/' + newUser._id;
+              sendActivationEmail(newUser.email, activationLink);
               req.flash('success', 'You are now registered, check email to activate acount');
               res.redirect('login');
             }
@@ -81,16 +81,55 @@ router.get('/logout', (req, res) => {
   res.redirect('/users/login');
 });
 
+router.get('/activate/:id', (req, res) => {
+  let user = {};
+  user.activated = true;
 
+  let query = {_id:req.params.id}
 
-function sendActivationEmail(receiver){
+  User.update(query, user, (err) => {
+    if(err){
+      console.log(err);
+      return;
+    } else {
+      req.flash('success', 'Actiavtion completed, now you can log in.');
+      res.redirect('/');
+    }
+  });
+});
+
+router.delete('/:id', (req, res) => {
+  if(!req.user._id){
+    res.status(500).send();
+  }
+
+  let query = {_id:req.params.id}
+
+  Article.findById(req.params.id, (err, article) => {
+    if(article.author != req.user._id){
+      res.status(500).send();
+    } else {
+
+      Article.remove(query, (err) => {
+        if(err){
+          console.log(err);
+        } else {
+          req.flash('danger', 'Article deleted');
+          res.send('Success');
+        }
+      });
+    }
+  });
+});
+
+function sendActivationEmail(receiver, activationLink){
 
   let mailOptions = {
     from: 'node.kb@interia.pl',
     to: receiver,
     subject: 'This is your activation link.',
     text: 'activationLink',
-    html: '<p> test </p>'
+    html: '<p> <a href="' + activationLink + '">Activate account! </a> </p>'
   };
 
   transporter.sendMail(mailOptions, (err, info) => {
