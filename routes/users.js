@@ -13,54 +13,65 @@ router.get('/register', (req, res) => {
 });
 
 router.post('/register', (req, res) => {
-  const name = req.body.name;
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
-  const password2 = req.body.password2;
 
-  req.checkBody('name', 'Name is required').notEmpty();
-  req.checkBody('username', 'Username is required').notEmpty();
-  req.checkBody('email', 'Email is required').notEmpty();
-  req.checkBody('password', 'Password is required').notEmpty();
-  req.checkBody('email', 'Use valid email').isEmail();
-  req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
+  let query = {email: req.body.email}
+  User.findOne(query, (err, user) => {
+    if(err){
+      console.log(err);
+    }
+    if(user){
+      req.flash('danger', 'User with provided email already exists');
+      res.redirect('register');
+    } else {
+      const name = req.body.name;
+      const username = req.body.username;
+      const email = req.body.email;
+      const password = req.body.password;
+      const password2 = req.body.password2;
 
-  let errors = req.validationErrors();
+      req.checkBody('name', 'Name is required').notEmpty();
+      req.checkBody('username', 'Username is required').notEmpty();
+      req.checkBody('email', 'Email is required').notEmpty();
+      req.checkBody('password', 'Password is required').notEmpty();
+      req.checkBody('email', 'Use valid email').isEmail();
+      req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
 
-  if(errors){
-    res.render('register', {
-      errors: errors
-    });
-  } else {
-    let newUser = new User({
-      name: name,
-      email: email,
-      username: username,
-      password: password
-    });
+      let errors = req.validationErrors();
 
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newUser.password, salt, (err, hash) => {
-        if(err){
-          console.log(err);
-        } else{
-          newUser.password = hash;
-          newUser.save((err) => {
+      if(errors){
+        res.render('register', {
+          errors: errors
+        });
+      } else {
+        let newUser = new User({
+          name: name,
+          email: email,
+          username: username,
+          password: password
+        });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err){
               console.log(err);
-            } else {
-              let activationLink = 'localhost:3000/users/activate/' + newUser._id;
-              sendActivationEmail(newUser.email, activationLink);
-              req.flash('success', 'You are now registered, check email to activate acount');
-              res.redirect('login');
+            } else{
+              newUser.password = hash;
+              newUser.save((err) => {
+                if(err){
+                  console.log(err);
+                } else {
+                  let activationLink = 'localhost:3000/users/activate/' + newUser._id;
+                  sendActivationEmail(newUser.email, activationLink);
+                  req.flash('success', 'You are now registered, check email to activate acount');
+                  res.redirect('login');
+                }
+              });
             }
           });
-        }
-      });
-    });
-
-  }
+        });
+      }
+    }
+  });
 });
 
 router.get('/login', (req, res) => {
