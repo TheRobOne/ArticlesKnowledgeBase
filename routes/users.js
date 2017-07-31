@@ -109,6 +109,32 @@ router.get('/activate/:id', (req, res) => {
   });
 });
 
+//get user by id
+router.get('/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('user', {
+        user: user
+      });
+    }
+  });
+});
+
+//get user by id
+router.get('users/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('user', {
+        user: user
+      });
+    }
+  });
+});
+
 router.delete('/:id', (req, res) => {
   if(!req.user._id){
     res.status(500).send();

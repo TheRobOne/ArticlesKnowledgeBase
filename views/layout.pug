@@ -14,16 +14,15 @@ html
             span.icon-bar
             span.icon-bar
           a.navbar-brand(href='/') KnowledgeBase
-        #navbar.collapse.navbar-collapse
+        .navbar.collapse.navbar-collapse
           ul.nav.navbar-nav
             li
               a(href='/') Home
-            if user==='user'
+            if user        
               li
                 a(href='/articles/add') Add article
-            if user==='admin'
               li
-                a(href='admin') Admin
+                a(href='/users/' + user._id)= user.username + '\'s profile'
           ul.nav.navbar-nav.navbar-right
             if user
               li
