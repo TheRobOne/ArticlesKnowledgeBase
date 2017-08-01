@@ -2,5 +2,10 @@ extends layout
 
 block content
   h1= user.username
+  a.btn.btn-default(href='/users/edit/' + user._id) Edit
   if user.role == 'admin'
-    h5 elo
+    ul.list-group
+      each user in users
+        li.list-group-item
+          h3= user.username
+          a.btn.btn-default(href='/users/edit/' + user._id) Edit

@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1 #{title}
+  form(method='POST', action='/users/edit/'+user._id)
+      .form-group
+        label Useraname:
+        input.form-control(name='title', type='text' value=user.username)
+      .form-group
+        label Name:
+        input.form-control(name='author', type='text' value=user.name)
+      .form-group
+        label Email:
+        input.form-control(name='author', type='text' value=user.email)
+      br
+      input.btn.btn-primary(type='submit',value='Submit')

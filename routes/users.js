@@ -115,23 +115,75 @@ router.get('/:id', (req, res) => {
     if(err){
       console.log(err);
     } else {
-      res.render('user', {
+      User.find({}, (err, users) => {
+        if (err){
+          console.log(err);
+        } else{
+          res.render('user', {
+            user: user,
+            users: users
+          });
+        }
+      });
+    }
+  });
+});
+
+//edit user by id
+router.get('/edit/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if(err){
+      console.log(err);
+    } else {
+      res.render('edit_user', {
         user: user
       });
     }
   });
 });
 
-//get user by id
-router.get('users/:id', (req, res) => {
-  User.findById(req.params.id, (err, user) => {
-    if(err){
+router.post('/edit/:id', (req, res) => {
+  let user = {};
+  user.username = req.body.username;
+  user.name = req.body.name;
+  user.email = req.body.email;
+
+  let query = {_id: req.params.id}
+
+  User.update(query, user, (err) => {
+    if (err){
       console.log(err);
-    } else {
-      res.render('user', {
-        user: user
+    }
+    console.log("elo");
+    if(User.email !== user.email){
+      console.log("elo3");
+      User.update(query, {activated: false}, (err) => {
+        if(err){
+          console.log(err);
+        }
+        else{
+          req.flash('success', 'You have to activate new email')
+        }
       });
     }
+  });
+});
+
+router.post('/edit/:id', (req, res) => {
+  let article = {};
+  article.title = req.body.title;
+  article.author = req.body.author;
+  article.body = req.body.body;
+
+  let query = {_id:req.params.id}
+
+  User.update(query, a, (err) => {
+    if(err){
+      console.log(err);
+      return;
+    }
+    req.flash('success', 'Article edited');
+    res.redirect('/');
   });
 });
 
